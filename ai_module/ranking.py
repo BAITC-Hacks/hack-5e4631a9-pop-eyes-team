@@ -12,8 +12,9 @@ from typing import Any
 
 from .evidence import EVIDENCE_VERSION, build_evidence
 from .candidates import normalize_candidate
+from .specificity import distinctive_evidence_ids
 
-PROMPT_VERSION = "ranking-v6"
+PROMPT_VERSION = "ranking-v7"
 RECOMMENDATION_VERSION = f"{PROMPT_VERSION}:{EVIDENCE_VERSION}:fallback-v2"
 MAX_REASON_LENGTH = 280
 MAX_QUOTES_LENGTH = 200
@@ -26,18 +27,59 @@ _SYSTEM_PROMPT = """Выбери ровно selection_count уникальных
 Все кандидаты уже прошли обязательные фильтры и укладываются в начальный бюджет.
 Не штрафуй за близость цены к бюджету. Отсутствие подтверждения не равно совпадению.
 Если preferences пусты, сравни профильный опыт для event_type.
+Конкретность цитаты НЕ является оценкой пригодности: большой стаж, известность
+и цифры не дают преимущества перед прямым совпадением с главным пожеланием.
 Пример: для делового события с юмором подтверждённый деловой опыт и тонкий юмор
 выше развлечений/танцев без сведений о деловой подаче. Для танцевального вечера
 подтверждённые развлечения и танцы выше общей интеллигентной подачи.
 
-Для каждого выбранного кандидата:
-- evidence_ids: 1–2 наиболее релевантных :description: ID ТОЛЬКО этого профиля.
-  Первой укажи самую важную для пожеланий цитату, желательно законченное предложение.
-  Суммарный текст цитат желательно до 200 символов; при превышении код оставит
-  только первую цитату целиком. Не перечисляй имя, город и цену.
-  Если описание пусто, разрешены короткие факты из структурированных полей.
-  Если пожелание не подтверждено, выбери ближайший факт описания,
-  характеризующий кандидата. Не подменяй его ссылками на имя или категорию.
+После выбора состава сравни объяснения выбранных кандидатов между собой.
+Они должны помогать различать подрядчиков, даже если скрыть имена.
+Не меняй состав ради разнообразия объяснений: выбирай разные подтверждённые
+особенности уже выбранных профилей, связанные с запросом.
+
+Для каждого выбранного кандидата верни ссылки на :description: ID ТОЛЬКО его профиля:
+1. distinctive_evidence_id — ОБЯЗАТЕЛЬНЫЙ конкретный отличительный факт:
+   специализация на нужном формате,
+   стаж, масштаб и примеры проведённых событий, профессиональный опыт, конкретная
+   программа или ограничения её содержания; для площадок — вместимость и услуги;
+   для оформления — техника, объём работ или примеры проектов.
+   Выбирай его из distinctive_evidence_ids профиля: код выделил фрагменты с
+   признаками опыта, масштаба или услуг. Остальное описание используй для подбора.
+2. Если несколько профилей обещают юмор, харизму, уют или индивидуальный подход,
+   ищи за этими словами различия в опыте и услугах. Рекламные обещания вроде
+   «каждый момент звучит правильно», «незабываемая атмосфера», «идеальный праздник»,
+   «мне доверяют» не выбирай, когда в профиле есть конкретные сведения.
+3. supporting_evidence_ids — пустой список либо ОДНА дополняющая конкретная цитата
+   из того же distinctive_evidence_ids о пожеланиях или программе. Не трать её
+   на общую похвалу или повтор отличительного факта другими словами.
+   Если две цитаты не помещаются в 200 символов, код сохранит distinctive_evidence_id.
+4. Предпочитай законченное предложение или самостоятельный пункт списка;
+   не выбирай обрывок перечисления без смысла. Имя, город и цена не являются
+   отличием для этого объяснения. Не выводи услугу из биографии: например, работа
+   певцом сама по себе не обещает музыкальный номер на заказанном мероприятии.
+5. Если конкретики мало, используй наиболее содержательную доступную особенность
+   (например, вид на горы у площадки). Не придумывай опыт, цифры или превосходство
+   над другими. Если описание пусто, разрешены структурированные факты.
+
+Примеры выбора (вымышленные тексты и ссылки, не факты о входных кандидатах):
+- Запрос «интеллигентный корпоратив». У A :description:1 = «Тонкий юмор»,
+  :description:2 = «Преподаёт сценическую речь». Ответ для A:
+  distinctive_evidence_id = A:description:2, supporting_evidence_ids = [].
+- Запрос «персональный подход». У B :description:1 = «Идеальный праздник»,
+  :description:2 = «Проводит вечера на трёх языках». Ответ для B:
+  distinctive_evidence_id = B:description:2, supporting_evidence_ids = [].
+  Не заменяй содержательный факт общими обещаниями только ради слов из пожеланий.
+- Запрос «оформление». У C :description:1 = «Оформляем мероприятия»,
+  :description:2 = «Собираем 500 букетов в месяц». Отличительный факт — C:description:2.
+- Для запроса без речей «Танцы без тостов» тоже конкретный отличительный факт.
+Если нужное свойство отсутствует в описании, не считай его подтверждённым.
+
+Контроль порядка перед ответом: если заказчику прежде всего нужны танцы и отсутствие
+речей, профиль с прямым указанием «развлечения и танцы» должен стоять выше профиля
+с большим телевизионным стажем, который про танцы ничего не сообщает. И наоборот,
+деловую специализацию ставь выше танцев, если заказчик просит деловой формат.
+Подбирай по ВСЕМ фактам профиля; список допустимых цитат не меняет этот приоритет.
 
 Объяснение и проверенную backend дату добавит код. Не возвращай пересказ или reason.
 Структурированные поля важнее рекламного описания; max_hours=null неприменимо.
@@ -50,16 +92,21 @@ _SELECTION_SCHEMA = {
     "properties": {
         "selected": {
             "type": "array",
+            "description": "Порядок по подтверждённым главным пожеланиям; опыт и масштаб не заменяют совпадение по контексту.",
             "items": {
                 "type": "object",
                 "properties": {
                     "id": {"type": "string"},
-                    "evidence_ids": {
+                    "distinctive_evidence_id": {
+                        "type": "string",
+                        "description": "ID конкретного факта об опыте, масштабе, программе или услугах; не общей похвалы.",
+                    },
+                    "supporting_evidence_ids": {
                         "type": "array", "items": {"type": "string"},
-                        "minItems": 1, "maxItems": 2,
+                        "minItems": 0, "maxItems": 1,
                     },
                 },
-                "required": ["id", "evidence_ids"],
+                "required": ["id", "distinctive_evidence_id", "supporting_evidence_ids"],
                 "additionalProperties": False,
             },
         }
@@ -102,9 +149,11 @@ def _selection_schema(payload: dict) -> dict:
         item = copy.deepcopy(item_template)
         props = item["properties"]
         props["id"]["enum"] = [candidate["id"]]
-        refs = list(candidate["evidence"])
-        description_refs = [ref for ref in refs if ref.startswith(f"{candidate['id']}:description:")]
-        props["evidence_ids"]["items"]["enum"] = description_refs or refs
+        quote_ids = distinctive_evidence_ids(candidate["id"], candidate["evidence"])
+        props["distinctive_evidence_id"]["enum"] = quote_ids
+        props["supporting_evidence_ids"]["items"]["enum"] = quote_ids
+        if len(quote_ids) == 1:
+            props["supporting_evidence_ids"]["maxItems"] = 0
         variants.append(item)
     array["items"] = {"anyOf": variants}
     array["minItems"] = array["maxItems"] = payload["selection_count"]
@@ -174,17 +223,23 @@ def _ground_selection(raw: Any, payload: dict) -> dict:
     request = payload["request"]
     grounded = []
     for item in raw["selected"]:
-        if not isinstance(item, dict) or set(item) != {"id", "evidence_ids"}:
+        if not isinstance(item, dict) or set(item) != {"id", "distinctive_evidence_id", "supporting_evidence_ids"}:
             raise ValueError("Unexpected model fields")
-        candidate_id, refs = item["id"], item["evidence_ids"]
+        candidate_id = item["id"]
         if not isinstance(candidate_id, str) or candidate_id not in evidence:
             raise ValueError("Unknown candidate")
-        if not isinstance(refs, list) or not 1 <= len(refs) <= 2:
-            raise ValueError("Expected one or two fact references")
+        supporting = item["supporting_evidence_ids"]
+        if not isinstance(supporting, list) or len(supporting) > 1:
+            raise ValueError("Expected zero or one supporting reference")
+        refs = [item["distinctive_evidence_id"], *supporting]
         if any(not isinstance(ref, str) or ref not in evidence[candidate_id] for ref in refs):
             raise ValueError("Unknown or foreign evidence")
-        if len(set(refs)) != len(refs):
-            raise ValueError("Repeated evidence id")
+        quote_ids = distinctive_evidence_ids(candidate_id, evidence[candidate_id])
+        if any(ref not in quote_ids for ref in refs):
+            raise ValueError("Quotes must use available concrete source facts")
+        # The same source in both internal roles adds no information. Collapse
+        # it before assembling the public list, which must remain unique.
+        refs = list(dict.fromkeys(refs))
         # Only outer punctuation is removed; no words (including negations)
         # are shortened. Drop the second fact as a whole if it does not fit.
         quotes = [evidence[candidate_id][ref].strip().rstrip(".!?…") for ref in refs]
@@ -218,6 +273,7 @@ async def _call_model(payload: dict, *, api_key: str, model: str, timeout: float
                 "schema": _selection_schema(payload),
             }},
             max_output_tokens=800,
+            temperature=0,
             store=False,
         )
         if response.status != "completed" or not response.output_text:
@@ -269,6 +325,7 @@ async def rank_candidates(request, eligible_candidates) -> dict:
         "candidates": [
             {
                 "id": candidate["id"],
+                "distinctive_evidence_ids": distinctive_evidence_ids(candidate["id"], evidence[candidate["id"]]),
                 "evidence": dict(sorted(
                     evidence[candidate["id"]].items(),
                     key=lambda item: (":description:" not in item[0], item[0]),

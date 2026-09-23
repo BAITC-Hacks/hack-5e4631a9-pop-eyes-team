@@ -52,7 +52,7 @@ def selection(*ids):
 
 def model_selection(*ids):
     return {"selected": [
-        {"id": item, "evidence_ids": [f"{item}:description:1"]}
+        {"id": item, "distinctive_evidence_id": f"{item}:description:1", "supporting_evidence_ids": []}
         for item in ids
     ]}
 
@@ -251,6 +251,7 @@ class RankingTests(unittest.IsolatedAsyncioTestCase):
             requests.append(body)
             self.assertEqual(str(request.url), "https://api.openai.com/v1/responses")
             self.assertEqual(body["model"], "gpt-4o-mini")
+            self.assertEqual(body["temperature"], 0)
             self.assertTrue(body["text"]["format"]["strict"])
             self.assertFalse(body["store"])
             self.assertEqual([message["role"] for message in body["input"]], ["system", "user"])
@@ -333,9 +334,12 @@ class GroundingTests(unittest.TestCase):
 
     def test_rejects_invented_context_label_and_foreign_facts(self):
         for field, value in [("request_evidence_id", "request:999"),
-                             ("evidence_ids", ["OTHER:description:1"]),
-                             ("match", "perfect"), ("evidence_ids", []),
-                             ("evidence_ids", ["TEST-A:field:anon_name"])]:
+                             ("distinctive_evidence_id", "OTHER:description:1"),
+                             ("match", "perfect"), ("distinctive_evidence_id", ""),
+                             ("distinctive_evidence_id", "TEST-A:field:anon_name"),
+                             ("supporting_evidence_ids", ["OTHER:description:1"]),
+                             ("supporting_evidence_ids", "TEST-A:description:2"),
+                             ("supporting_evidence_ids", ["TEST-A:description:1", "TEST-A:description:2"])]:
             raw = model_selection("TEST-A")
             raw["selected"][0][field] = value
             with self.subTest(field=field, value=value), self.assertRaises(ValueError):
@@ -357,19 +361,19 @@ class GroundingTests(unittest.TestCase):
         facts["TEST-A:description:1"] = "Без долгих речей и наставлений."
         facts["TEST-A:description:2"] = "Только развлечения и танцы."
         raw = model_selection("TEST-A")
-        raw["selected"][0]["evidence_ids"].append("TEST-A:description:2")
+        raw["selected"][0]["supporting_evidence_ids"].append("TEST-A:description:2")
         item = ranking._ground_selection(raw, self.payload)["selected"][0]
         self.assertIn('«Без долгих речей и наставлений»; «Только развлечения и танцы»', item["reason"])
-        self.assertEqual(item["evidence_ids"], raw["selected"][0]["evidence_ids"])
+        self.assertEqual(item["evidence_ids"], ["TEST-A:description:1", "TEST-A:description:2"])
 
     def test_over_budget_drops_second_quote_and_reference_without_cutting_words(self):
         facts = self.payload["candidates"][0]["evidence"]
         first = "Не проводит конкурсы без согласования с заказчиком; заранее готовит сценарий и учитывает особенности аудитории"
-        second = "Использует короткие выступления и уделяет внимание гостям; помогает согласовать программу и музыкальное сопровождение"
+        second = "Использует короткие выступления и уделяет внимание гостям; помогает согласовать программу, DJ и музыкальное сопровождение"
         facts["TEST-A:description:1"] = first + "."
         facts["TEST-A:description:2"] = second + "."
         raw = model_selection("TEST-A")
-        raw["selected"][0]["evidence_ids"].append("TEST-A:description:2")
+        raw["selected"][0]["supporting_evidence_ids"].append("TEST-A:description:2")
         item = ranking._ground_selection(raw, self.payload)["selected"][0]
         self.assertIn(first, item["reason"])
         self.assertNotIn(second, item["reason"])
