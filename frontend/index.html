@@ -20,28 +20,30 @@
         <h2 id="form-title"><span class="step">01</span> Ваше событие</h2>
         <p class="muted">Поля со звёздочкой обязательны.</p>
         <form id="recommendation-form">
+          <fieldset id="request-fields" disabled>
           <div class="fields">
-            <label>Город *<select name="city" required><option value="">Выберите город</option><option selected>Алматы</option><option>Астана</option></select></label>
-            <label>Дата *<input type="date" name="date" value="2026-10-10" min="2026-09-23" max="2026-12-31" required></label>
-            <label>Формат *<select name="event_type" required><option value="">Выберите формат</option><option value="корпоратив" selected>Корпоратив</option><option value="свадьба">Свадьба</option><option value="день рождения">День рождения</option></select></label>
-            <label>Категория *<select name="category" required><option value="">Выберите категорию</option><option>Ведущий</option><option>Флорист</option><option>Декоратор</option><option>Банкетный зал</option></select></label>
+            <label>Город *<select name="city" required><option value="">Загрузка…</option></select></label>
+            <label>Дата *<input type="date" name="date" required></label>
+            <label>Формат *<select name="event_type" required><option value="">Загрузка…</option></select></label>
+            <label>Категория *<select name="category" required><option value="">Загрузка…</option></select></label>
             <label>Бюджет, ₸ *<input type="number" name="budget_kzt" min="1" step="1" value="1000000" inputmode="numeric" required></label>
-            <label>Длительность, часов<input type="number" name="duration_hours" min="1" step="1" placeholder="Если важно" inputmode="numeric"></label>
-            <label class="wide">Язык<select name="language"><option value="">Не важно</option><option>Русский</option><option>Казахский</option><option>Английский</option></select></label>
+            <label>Длительность, часов<input type="number" name="duration_hours" min="0.1" step="any" placeholder="Если важно" inputmode="decimal"></label>
+            <label class="wide">Язык<select name="language"><option value="">Не важно</option></select></label>
             <label class="wide">Пожелания к подрядчику<textarea name="preferences" rows="4" maxlength="1000" placeholder="Например: деловой корпоратив для IT-команды, интеллигентный юмор, без долгих речей."></textarea><small>Стиль, аудитория и атмосфера помогут сравнить подходящих кандидатов.</small></label>
           </div>
-          <button class="primary" type="submit">Показать пример результата →</button>
+          <button class="primary" type="submit">Подобрать подрядчиков →</button>
+          </fieldset>
         </form>
+        <p id="form-status" class="hint" role="status">Загружаем параметры из каталога…</p>
+        <button id="retry-options" class="secondary" type="button" hidden>Повторить загрузку</button>
       </section>
       <section class="panel" aria-labelledby="results-title">
         <h2 id="results-title"><span class="step">02</span> Подбор</h2>
         <p class="muted">Результат с учётом ваших условий.</p>
-        <div class="demo-controls"><strong class="demo-tag">Демо</strong><label for="demo-scenario">Пример ответа</label><select id="demo-scenario"><option value="matched">Подобрали кандидатов</option><option value="category_absent">Категории нет в городе</option><option value="no_matches">Никто не прошёл условия</option><option value="fallback">Резервный подбор</option></select></div>
-        <p class="notice">Пока показаны примеры интерфейса. Реальные рекомендации появятся после подключения API.</p>
-        <div id="result" class="placeholder" role="status" aria-live="polite">Заполните форму и нажмите кнопку, чтобы увидеть пример ответа.</div>
+        <div id="result" class="placeholder" role="status" aria-live="polite">Заполните форму и нажмите кнопку, чтобы подобрать подрядчиков из каталога.</div>
       </section>
     </div>
-    <p class="footer-note">Цена в карточках — начальная стоимость, а не окончательная смета. Доступность известна только с 23 сентября по 31 декабря 2026 года.</p>
+    <p class="footer-note">Цена в карточках — начальная стоимость, а не окончательная смета. <span id="calendar-note"></span></p>
   </main>
 </body>
 </html>

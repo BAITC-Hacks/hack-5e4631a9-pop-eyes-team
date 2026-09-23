@@ -66,7 +66,9 @@ class BootstrapTests(unittest.TestCase):
         for response_field, source_field in (("categories", "categories"), ("event_types", "event_formats"), ("languages", "languages")):
             expected = {value for row in self.source_rows for value in row[source_field].split("|")}
             self.assertEqual(set(options[response_field]), expected)
-        self.assertEqual(options["calendar_window"], {"start": "2026-09-23", "end": "2026-12-31"})
+        self.assertEqual(options["date_min"], "2026-09-23")
+        self.assertEqual(options["date_max"], "2026-12-31")
+        self.assertNotIn("calendar_window", options)
 
     def test_profile_preserves_null_and_flags(self):
         profile = self.get_json("/api/contractors/HK-39372")

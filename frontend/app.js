@@ -1,37 +1,79 @@
 "use strict";
 
-// Только примеры отображения. Реальные карточки придут из API на втором часу.
-const examples = {
-  matched: {
-    status: "matched", message: "Нашли подходящих подрядчиков. Сравните объяснения и выберите, кого обсудить подробнее.",
-    total_in_city_category: 10, eligible_count: 4, selection_mode: "ai", cache_hit: false,
-    excluded_counts: { date: 6, budget: 0, event_type: 0, duration: 0, language: 0 },
-    cards: [
-      { id: "DEMO-1", name: "Пример подрядчика 1", categories: ["Ведущий"], city: "Алматы", price_from_kzt: 350000, reason: "Пример объяснения: здесь будет указано, какие особенности профиля отвечают пожеланиям заказчика." },
-      { id: "DEMO-2", name: "Пример подрядчика 2", categories: ["Ведущий"], city: "Алматы", price_from_kzt: 500000, reason: "Пример объяснения: здесь будет показано конкретное преимущество кандидата для события." },
-      { id: "DEMO-3", name: "Пример подрядчика 3", categories: ["Ведущий"], city: "Алматы", price_from_kzt: 700000, reason: "Пример объяснения: здесь будет указано, чем этот вариант отличается от других." }
-    ]
-  },
-  category_absent: { status: "category_absent", message: "В выбранном городе нет подрядчиков этой категории.", total_in_city_category: 0, eligible_count: 0, excluded_counts: {}, selection_mode: null, cache_hit: false, cards: [] },
-  no_matches: { status: "no_matches", message: "Такая категория есть в городе, но никто не прошёл заданные условия.", total_in_city_category: 10, eligible_count: 0, excluded_counts: { date: 0, budget: 10, event_type: 0, duration: 0, language: 0 }, selection_mode: null, cache_hit: false, cards: [] },
-  fallback: {
-    status: "matched", message: "Подходящие подрядчики найдены. Сейчас показан резервный подбор без AI.",
-    total_in_city_category: 2, eligible_count: 1, selection_mode: "fallback", cache_hit: false,
-    excluded_counts: { date: 1, budget: 0, event_type: 0, duration: 0, language: 0 },
-    cards: [{ id: "DEMO-4", name: "Пример флориста", categories: ["Флорист"], city: "Алматы", price_from_kzt: 200000, reason: "Пример резервного объяснения: кандидат проходит обязательные условия. Конкретные факты появятся с данными API." }]
-  }
-};
-
 const form = document.querySelector("#recommendation-form");
-const scenario = document.querySelector("#demo-scenario");
+const fields = document.querySelector("#request-fields");
 const result = document.querySelector("#result");
+const formStatus = document.querySelector("#form-status");
+const retryOptions = document.querySelector("#retry-options");
+const submitButton = form.querySelector("[type=submit]");
 const money = new Intl.NumberFormat("ru-RU");
+const labels = { city: "Город", date: "Дата", event_type: "Формат", category: "Категория", budget_kzt: "Бюджет", duration_hours: "Длительность", language: "Язык", preferences: "Пожелания" };
+let optionsReady = false;
+let submitting = false;
 
 function node(tag, className, value) {
   const item = document.createElement(tag);
   if (className) item.className = className;
   if (value !== undefined) item.textContent = String(value);
   return item;
+}
+
+async function api(path, init = {}) {
+  let response;
+  try {
+    response = await fetch(path, { ...init, signal: AbortSignal.timeout(45000) });
+  } catch (error) {
+    throw new Error(error.name === "TimeoutError" ? "Сервер не ответил вовремя. Повторите запрос." : "Не удалось связаться с сервером. Проверьте соединение и повторите запрос.");
+  }
+  let data;
+  try { data = await response.json(); }
+  catch { throw new Error("Сервер вернул неожиданный ответ. Повторите запрос позже."); }
+  if (!response.ok) {
+    if (response.status === 422 && Array.isArray(data.detail)) {
+      throw new Error(data.detail.map((e) => `${labels[e.loc?.[1]] || "Поле"}: ${e.msg}`).join(" "));
+    }
+    throw new Error(data.detail?.message || "Сервис временно недоступен. Повторите запрос позже.");
+  }
+  return data;
+}
+
+function fillSelect(name, values, preferred, optional = false) {
+  const select = form.elements.namedItem(name);
+  const previous = select.value || preferred;
+  select.replaceChildren();
+  if (optional) select.append(new Option("Не важно", ""));
+  values.forEach((value) => select.append(new Option(value, value)));
+  if (values.includes(previous)) select.value = previous;
+  else if (optional) select.value = "";
+}
+
+async function loadOptions() {
+  optionsReady = false;
+  fields.disabled = true;
+  retryOptions.hidden = true;
+  formStatus.textContent = "Загружаем параметры из каталога…";
+  formStatus.className = "hint";
+  try {
+    const options = await api("/api/options");
+    fillSelect("city", options.cities, "Алматы");
+    fillSelect("category", options.categories, "Ведущий");
+    fillSelect("event_type", options.event_types, "корпоратив");
+    fillSelect("language", options.languages, "", true);
+    const dateInput = form.elements.namedItem("date");
+    dateInput.min = options.date_min;
+    dateInput.max = options.date_max;
+    const initialDate = dateInput.value || "2026-10-10";
+    dateInput.value = initialDate < options.date_min ? options.date_min : initialDate > options.date_max ? options.date_max : initialDate;
+    const displayDate = (value) => value.split("-").reverse().join(".");
+    document.querySelector("#calendar-note").textContent = `Доступность известна с ${displayDate(options.date_min)} по ${displayDate(options.date_max)} включительно.`;
+    formStatus.textContent = "Параметры загружены из каталога.";
+    optionsReady = true;
+    fields.disabled = false;
+  } catch (error) {
+    formStatus.textContent = error.message;
+    formStatus.className = "hint error";
+    retryOptions.hidden = false;
+  }
 }
 
 function buildRequest(formElement) {
@@ -48,8 +90,13 @@ function buildRequest(formElement) {
 function renderCard(card) {
   const article = node("article", "card");
   const top = node("div", "card-top");
-  top.append(node("span", "category", (card.categories || []).join(" · ")), node("span", "muted", card.city));
+  top.append(node("span", "category", card.categories.join(" · ")), node("span", "muted", card.city));
   article.append(top, node("h4", "", card.name), node("p", "card-reason", card.reason));
+  const flags = [];
+  if (card.synthetic) flags.push("Синтетический профиль");
+  if (card.city_imputed) flags.push("Город подставлен в датасете");
+  if (card.price_imputed) flags.push("Цена подставлена в датасете");
+  if (flags.length) article.append(node("p", "data-flags", flags.join(" · ")));
   const bottom = node("div", "card-bottom");
   bottom.append(node("strong", "", `от ${money.format(card.price_from_kzt)} ₸`), node("span", "muted", card.id));
   article.append(bottom);
@@ -63,6 +110,9 @@ function renderResponse(response) {
   const title = response.status === "matched" ? "Есть варианты для вас" : response.status === "category_absent" ? "Категории пока нет" : "Подходящих вариантов нет";
   summary.append(node("h3", "", title), node("p", "", response.message));
   result.append(summary);
+  const exclusionLabels = { date: "заняты на дату", budget: "выше бюджета", event_type: "другой формат", duration: "не подходят по длительности", language: "другой язык" };
+  const exclusions = Object.entries(response.excluded_counts).filter(([, count]) => count > 0).map(([key, count]) => `${exclusionLabels[key]} — ${count}`);
+  if (exclusions.length) result.append(node("p", "hint", `Исключены: ${exclusions.join("; ")}. Каждый кандидат учтён один раз.`));
   if (response.status !== "matched") {
     result.append(node("p", "hint", response.status === "category_absent" ? "Попробуйте выбрать другой город или категорию." : "Попробуйте изменить дату, бюджет или другие обязательные условия."));
     return;
@@ -77,9 +127,28 @@ function renderResponse(response) {
   if (response.cards.length < 3) result.append(node("p", "hint", `Карточек меньше трёх: условиям соответствуют только ${response.eligible_count}.`));
 }
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!form.reportValidity()) return;
-  buildRequest(form); // Объект запроса будет отправлен POST /api/recommendations на втором часу.
-  renderResponse(examples[scenario.value]);
+  if (!optionsReady || submitting || !form.reportValidity()) return;
+  const request = buildRequest(form);
+  submitting = true;
+  fields.disabled = true;
+  submitButton.textContent = "Подбираем…";
+  result.className = "placeholder";
+  result.setAttribute("aria-busy", "true");
+  result.replaceChildren(node("p", "", "Проверяем условия и выбираем подходящих подрядчиков…"));
+  try {
+    renderResponse(await api("/api/recommendations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(request) }));
+  } catch (error) {
+    result.className = "placeholder error";
+    result.replaceChildren(node("p", "", error.message));
+  } finally {
+    submitting = false;
+    fields.disabled = false;
+    submitButton.textContent = "Подобрать подрядчиков →";
+    result.setAttribute("aria-busy", "false");
+  }
 });
+
+retryOptions.addEventListener("click", loadOptions);
+loadOptions();

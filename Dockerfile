@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --create-home --uid 10001 appuser
 
 COPY app ./app
+COPY frontend ./frontend
 COPY tests ./tests
 COPY ["hackathon dataset anonymized .csv", "./data/contractors.csv"]
 
