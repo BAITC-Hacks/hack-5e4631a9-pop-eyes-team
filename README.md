@@ -83,7 +83,7 @@ docker compose exec db psql -U eventmatch -d eventmatch -v ON_ERROR_STOP=1 -f /d
 
 ```dotenv
 AI_MODULE=ai_module
-AI_VERSION=ranking-v5:evidence-v3:fallback-v1
+AI_VERSION=ranking-v6:evidence-v3:fallback-v2
 AI_MODE=auto
 AI_TIMEOUT_SECONDS=8
 OPENAI_API_KEY=your_key
@@ -92,7 +92,7 @@ OPENAI_MODEL=gpt-4o-mini
 
 Модуль экспортирует асинхронную функцию `rank_candidates` и общую синхронную функцию `build_evidence(candidate)`. Требования и пример входа/выхода — в [контракте](docs/API_CONTRACT.md#интерфейс-ai-модуля), подробности реализации — в [AI_MODULE.md](docs/AI_MODULE.md). В асинхронной функции используйте неблокирующий клиент, иначе внешний таймаут не сможет остановить блокирующий вызов.
 
-Пустой `AI_MODULE` либо `AI_MODE=fallback` включает резервный режим. После изменения настройки или кода пересоберите app. При изменении prompt, разбиения evidence или поведения модуля повышайте `AI_VERSION`, чтобы старый кэш не скрывал изменения. Ключи остаются на сервере; `.env` исключён из Git и Docker build context.
+Пустой `AI_MODULE` либо `AI_MODE=fallback` включает резервный режим. После изменения настройки или кода пересоберите app. Ключ кэша автоматически включает экспортированную `RECOMMENDATION_VERSION` модуля; `AI_VERSION` можно использовать для дополнительного ручного обновления кэша. Ключи остаются на сервере; `.env` исключён из Git и Docker build context.
 
 ## Проверка
 
@@ -121,8 +121,9 @@ python scripts/build_ai_fixtures.py --check
 python -m ai_module.evaluate
 ```
 
-35 локальных тестов проходят. Отдельный прогон семи непустых сценариев через OpenAI
-занял 1,56–3,82 секунды на вызов; два пустых сценария обошлись без сети.
+42 локальных теста проходят. Отдельный прогон семи непустых сценариев через OpenAI
+занял 2,00–3,48 секунды на вызов; два пустых сценария обошлись без сети.
+Объяснения содержат проверенную дату и короткие цитаты: 122–251 символ в этом прогоне.
 Это проверка AI-модуля, не измерение полного HTTP-сценария с БД.
 [Результаты и ограничения](docs/AI_EVALUATION.md), [инструкция AI](docs/AI_MODULE.md).
 
