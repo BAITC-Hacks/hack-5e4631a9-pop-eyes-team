@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "source": "hackathon dataset anonymized .csv",
+    "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+    "expected_status": "matched",
+    "expected_eligible_count": 2,
+    "expected_fallback_ids": [
+      "HK-64395",
+      "HK-90011"
+    ],
+    "quality_checks": {
+      "first_in": [
+        "HK-90011"
+      ]
+    }
+  },
+  "request": {
+    "city": "Алматы",
+    "date": "2026-11-14",
+    "event_type": "корпоратив",
+    "category": "Банкетный зал",
+    "budget_kzt": 6000000,
+    "duration_hours": null,
+    "language": null,
+    "preferences": "Корпоратив примерно на 180 гостей. В приоритете подтверждённая вместимость, свой кейтеринг и парковка."
+  },
+  "eligible_candidates": [
+    {
+      "id": "HK-64395",
+      "anon_name": "Иноскэ Хашибира",
+      "categories": [
+        "Банкетный зал",
+        "Загородная площадка",
+        "Ресторан"
+      ],
+      "city": "Алматы",
+      "city_imputed": true,
+      "synthetic": false,
+      "price_from_kzt": 2500000,
+      "price_imputed": true,
+      "event_formats": [
+        "свадьба",
+        "корпоратив",
+        "юбилей",
+        "день рождения"
+      ],
+      "languages": [
+        "русский",
+        "английский"
+      ],
+      "max_hours": 8.0,
+      "description": "Nerima Terrace – стильная панорамная локация в Алматы с захватывающим видом на город и горы. Пространство сочетает современную атмосферу, уютные террасы и эффектные закаты, идеально подходя для мероприятий, романтических вечеров и отдыха в одном из самых живописных мест города."
+    },
+    {
+      "id": "HK-90011",
+      "anon_name": "Гохан",
+      "categories": [
+        "Банкетный зал",
+        "Отель",
+        "Ресторан"
+      ],
+      "city": "Алматы",
+      "city_imputed": false,
+      "synthetic": true,
+      "price_from_kzt": 3200000,
+      "price_imputed": true,
+      "event_formats": [
+        "свадьба",
+        "той",
+        "корпоратив",
+        "юбилей"
+      ],
+      "languages": [
+        "казахский",
+        "русский"
+      ],
+      "max_hours": 8.0,
+      "description": "Grand Sora Hotel – отель с банкетным залом и рестораном в центре Алматы. Панорамные окна, вместимость зала до 200 гостей, свой кейтеринг и парковка для гостей мероприятия."
+    }
+  ]
+}

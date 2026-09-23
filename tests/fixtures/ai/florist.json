@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "source": "hackathon dataset anonymized .csv",
+    "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+    "expected_status": "matched",
+    "expected_eligible_count": 1,
+    "expected_fallback_ids": [
+      "HK-39372"
+    ],
+    "quality_checks": {}
+  },
+  "request": {
+    "city": "Алматы",
+    "date": "2026-10-10",
+    "event_type": "корпоратив",
+    "category": "Флорист",
+    "budget_kzt": 500000,
+    "duration_hours": null,
+    "language": null,
+    "preferences": "Нужно авторское цветочное оформление корпоративного мероприятия."
+  },
+  "eligible_candidates": [
+    {
+      "id": "HK-39372",
+      "anon_name": "Тони Тони Чоппер",
+      "categories": [
+        "Флорист"
+      ],
+      "city": "Алматы",
+      "city_imputed": false,
+      "synthetic": false,
+      "price_from_kzt": 200000,
+      "price_imputed": true,
+      "event_formats": [
+        "свадьба",
+        "корпоратив",
+        "конференция",
+        "юбилей"
+      ],
+      "languages": [
+        "русский"
+      ],
+      "max_hours": null,
+      "description": "Мы специализируемся на авторском цветочном оформлении и флористике для мероприятий в Алматы. Ежемесячно реализуем более 1000 заказов. Среди наших клиентов и партнёров: SkyLumen, CoffeeNoir, Trickster Café, Suisei Water, Curly Sensei, Hoshizora, Банк «Sakura Credit». Также выполняли оформление для Hotel Akatsuki, Fuyuki Grand и Atelier Sakura."
+    }
+  ]
+}
