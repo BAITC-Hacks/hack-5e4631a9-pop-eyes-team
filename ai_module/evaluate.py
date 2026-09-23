@@ -6,10 +6,12 @@ import json
 import os
 import time
 from datetime import datetime, timezone
+from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
 from . import RECOMMENDATION_VERSION, build_evidence, rank_candidates
+from .ranking import MAX_REASON_LENGTH
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "tests/fixtures/ai"
 
@@ -28,6 +30,11 @@ def check_result(fixture, result, *, live):
         facts = build_evidence(candidates[item["id"]])
         if not item["reason"].strip() or not item["evidence_ids"] or any(ref not in facts for ref in item["evidence_ids"]):
             errors.append(f"invalid_explanation_or_evidence:{item['id']}")
+        day = date.fromisoformat(fixture["request"]["date"]).strftime("%d.%m.%Y")
+        if not item["reason"].startswith(f"Свободен по календарю на {day}."):
+            errors.append(f"missing_checked_date:{item['id']}")
+        if len(item["reason"]) > MAX_REASON_LENGTH:
+            errors.append(f"explanation_too_long:{item['id']}")
     if live and candidates:
         if result["selection_mode"] != "ai":
             errors.append("expected_ai_got_fallback")
@@ -80,6 +87,7 @@ async def run(args):
             "name": path.stem, "source_sha256_lf": fixture["_meta"]["source_sha256_lf"],
             "request": fixture["request"], "eligible_ids": sorted(profiles),
             "elapsed_seconds": elapsed, "result": result, "cited_facts": evidence,
+            "reason_lengths": [len(item["reason"]) for item in result["selected"]],
             "automated_check_errors": errors,
         })
         print(f"{path.stem}: {result['selection_mode']}, {elapsed}s, errors={errors}", flush=True)

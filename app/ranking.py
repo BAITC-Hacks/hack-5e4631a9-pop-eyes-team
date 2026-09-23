@@ -13,6 +13,18 @@ from app.schemas import RankingResult
 logger = logging.getLogger(__name__)
 
 
+def module_version() -> str:
+    """Include the module's implementation version in persistent cache keys."""
+    name = os.environ.get("AI_MODULE", "").strip()
+    if not name:
+        return "disabled"
+    try:
+        version = getattr(importlib.import_module(name), "RECOMMENDATION_VERSION", None)
+    except Exception:
+        return "unavailable"  # select_candidates handles failure with fallback.
+    return version if isinstance(version, str) and version else "unversioned"
+
+
 def build_evidence(candidate: dict) -> dict[str, str]:
     """Stable fact IDs shared by backend and the future AI module."""
     prefix = candidate["id"]

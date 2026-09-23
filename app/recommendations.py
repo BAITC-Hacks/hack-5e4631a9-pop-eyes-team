@@ -10,7 +10,7 @@ from starlette.concurrency import run_in_threadpool
 
 from app.catalog import catalog_options, load_catalog
 from app.db import connect
-from app.ranking import select_candidates
+from app.ranking import module_version, select_candidates
 from app.schemas import RecommendationRequest, RecommendationResponse
 
 
@@ -63,6 +63,7 @@ def digest(value: dict) -> str:
 def recommendation_version() -> str:
     config = {"rules": "backend-v1", "ai_module": os.environ.get("AI_MODULE", "").strip(),
               "ai_version": os.environ.get("AI_VERSION", "v1"),
+              "ai_implementation": module_version(),
               "model": os.environ.get("OPENAI_MODEL", "gpt-4o-mini"),
               "mode": os.environ.get("AI_MODE", "auto"),
               "timeout": os.environ.get("AI_TIMEOUT_SECONDS", "5")}

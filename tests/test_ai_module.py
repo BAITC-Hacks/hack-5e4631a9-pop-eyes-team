@@ -52,8 +52,7 @@ def selection(*ids):
 
 def model_selection(*ids):
     return {"selected": [
-        {"id": item, "evidence_ids": [f"{item}:description:1"],
-         "request_evidence_id": "request:1"}
+        {"id": item, "evidence_ids": [f"{item}:description:1"]}
         for item in ids
     ]}
 
@@ -143,7 +142,8 @@ class RankingTests(unittest.IsolatedAsyncioTestCase):
         with patch.dict(os.environ, {"AI_MODE": "fallback"}):
             item = (await rank_candidates(REQUEST, [profile]))["selected"][0]
         self.assertIn("от 200 000", item["reason"])
-        self.assertEqual(item["reason"].count("подставленное значение"), 2)
+        self.assertEqual(item["reason"].count("подставленное значение"), 1)
+        self.assertTrue(item["reason"].startswith("Свободен по календарю на 10.10.2026."))
         self.assertTrue(set(item["evidence_ids"]) <= set(build_evidence(profile)))
 
     async def test_rejects_unknown_duplicate_or_wrong_count(self):
@@ -271,8 +271,8 @@ class RankingTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["selection_mode"], "ai")
         self.assertEqual([item["id"] for item in result["selected"]], ["TEST-D", "TEST-B", "TEST-C"])
         for item in result["selected"]:
-            self.assertIn("Ведёт деловые мероприятия.", item["reason"])
-            self.assertIn("По пожеланию", item["reason"])
+            self.assertIn("«Ведёт деловые мероприятия»", item["reason"])
+            self.assertIn("Свободен по календарю на 10.10.2026.", item["reason"])
         self.assertEqual(len(requests), 1)
 
     async def test_raw_postgresql_numbers_work_in_fallback(self):
@@ -318,11 +318,12 @@ class GroundingTests(unittest.TestCase):
         self.payload = {"request": REQUEST, "selection_count": 1,
                         "candidates": [{"id": "TEST-A", "evidence": build_evidence(self.profile)}]}
 
-    def test_reason_uses_only_exact_quotes_and_request_excerpt(self):
+    def test_reason_uses_checked_date_and_quote_without_repeating_preferences(self):
         raw = model_selection("TEST-A")
         result = ranking._ground_selection(raw, self.payload)
         reason = result["selected"][0]["reason"]
-        self.assertEqual(reason, 'По пожеланию «Интеллигентный юмор, без длинных речей»: в профиле указано «Ведёт деловые мероприятия.».')
+        self.assertEqual(reason, 'Свободен по календарю на 10.10.2026. В профиле: «Ведёт деловые мероприятия».')
+        self.assertNotIn(REQUEST["preferences"], reason)
 
     def test_model_cannot_inject_fabricated_reason(self):
         raw = model_selection("TEST-A")
@@ -340,16 +341,47 @@ class GroundingTests(unittest.TestCase):
             with self.subTest(field=field, value=value), self.assertRaises(ValueError):
                 ranking._ground_selection(raw, self.payload)
 
-    def test_empty_preferences_use_event_type(self):
+    def test_empty_preferences_still_include_checked_date_and_profile_fact(self):
         self.payload["request"] = {**REQUEST, "preferences": ""}
         raw = model_selection("TEST-A")
         reason = ranking._ground_selection(raw, self.payload)["selected"][0]["reason"]
-        self.assertTrue(reason.startswith('Для формата «корпоратив»'))
+        self.assertEqual(reason, 'Свободен по календарю на 10.10.2026. В профиле: «Ведёт деловые мероприятия».')
 
     def test_long_source_quotes_are_rejected_not_silently_truncated(self):
         self.payload["candidates"][0]["evidence"]["TEST-A:description:1"] = "А" * 361
         with self.assertRaises(ValueError):
             ranking._ground_selection(model_selection("TEST-A"), self.payload)
+
+    def test_two_short_quotes_preserve_negation_and_all_references(self):
+        facts = self.payload["candidates"][0]["evidence"]
+        facts["TEST-A:description:1"] = "Без долгих речей и наставлений."
+        facts["TEST-A:description:2"] = "Только развлечения и танцы."
+        raw = model_selection("TEST-A")
+        raw["selected"][0]["evidence_ids"].append("TEST-A:description:2")
+        item = ranking._ground_selection(raw, self.payload)["selected"][0]
+        self.assertIn('«Без долгих речей и наставлений»; «Только развлечения и танцы»', item["reason"])
+        self.assertEqual(item["evidence_ids"], raw["selected"][0]["evidence_ids"])
+
+    def test_over_budget_drops_second_quote_and_reference_without_cutting_words(self):
+        facts = self.payload["candidates"][0]["evidence"]
+        first = "Не проводит конкурсы без согласования с заказчиком; заранее готовит сценарий и учитывает особенности аудитории"
+        second = "Использует короткие выступления и уделяет внимание гостям; помогает согласовать программу и музыкальное сопровождение"
+        facts["TEST-A:description:1"] = first + "."
+        facts["TEST-A:description:2"] = second + "."
+        raw = model_selection("TEST-A")
+        raw["selected"][0]["evidence_ids"].append("TEST-A:description:2")
+        item = ranking._ground_selection(raw, self.payload)["selected"][0]
+        self.assertIn(first, item["reason"])
+        self.assertNotIn(second, item["reason"])
+        self.assertEqual(item["evidence_ids"], ["TEST-A:description:1"])
+        self.assertLessEqual(len(item["reason"]), 280)
+
+    def test_changed_date_is_reflected_without_claiming_reservation(self):
+        self.payload["request"] = {**REQUEST, "date": "2026-12-19"}
+        reason = ranking._ground_selection(model_selection("TEST-A"), self.payload)["selected"][0]["reason"]
+        self.assertIn("19.12.2026", reason)
+        self.assertNotIn("10.10.2026", reason)
+        self.assertNotIn("забронирован", reason)
 
 
 if __name__ == "__main__":
