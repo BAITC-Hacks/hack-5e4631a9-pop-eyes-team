@@ -5,11 +5,21 @@ const fields = document.querySelector("#request-fields");
 const result = document.querySelector("#result");
 const formStatus = document.querySelector("#form-status");
 const retryOptions = document.querySelector("#retry-options");
+const presetButtons = document.querySelector("#demo-presets");
 const submitButton = form.querySelector("[type=submit]");
 const money = new Intl.NumberFormat("ru-RU");
 const labels = { city: "Город", date: "Дата", event_type: "Формат", category: "Категория", budget_kzt: "Бюджет", duration_hours: "Длительность", language: "Язык", preferences: "Пожелания" };
 let optionsReady = false;
 let submitting = false;
+
+const presets = {
+  business: { city: "Алматы", date: "2026-10-10", event_type: "корпоратив", category: "Ведущий", budget_kzt: "1000000", preferences: "Деловой корпоратив: в первую очередь опыт деловых мероприятий и интеллигентный юмор. Без навязчивых конкурсов." },
+  informal: { city: "Алматы", date: "2026-10-10", event_type: "корпоратив", category: "Ведущий", budget_kzt: "1000000", preferences: "Неформальный корпоратив: главный акцент на развлечениях и танцах, без долгих речей и наставлений." },
+  december: { city: "Алматы", date: "2026-12-19", event_type: "корпоратив", category: "Ведущий", budget_kzt: "1000000", preferences: "Деловой корпоратив для IT-команды: интеллигентный юмор." },
+  florist: { city: "Алматы", date: "2026-10-10", event_type: "корпоратив", category: "Флорист", budget_kzt: "500000", preferences: "Сдержанное оформление корпоративного вечера." },
+  low_budget: { city: "Алматы", date: "2026-10-10", event_type: "корпоратив", category: "Ведущий", budget_kzt: "10000", preferences: "" },
+  absent: { city: "Астана", date: "2026-10-10", event_type: "корпоратив", category: "Декоратор", budget_kzt: "1000000", preferences: "" }
+};
 
 function node(tag, className, value) {
   const item = document.createElement(tag);
@@ -87,6 +97,32 @@ function buildRequest(formElement) {
   };
 }
 
+function applyPreset(name) {
+  const preset = presets[name];
+  if (!optionsReady || !preset || submitting) return;
+  for (const key of ["city", "event_type", "category"]) {
+    const select = form.elements.namedItem(key);
+    if (![...select.options].some((option) => option.value === preset[key])) {
+      formStatus.textContent = "Этот готовый запрос недоступен в текущем каталоге.";
+      formStatus.className = "hint error";
+      return;
+    }
+  }
+  const date = form.elements.namedItem("date");
+  if (preset.date < date.min || preset.date > date.max) {
+    formStatus.textContent = "Дата готового запроса находится вне календаря каталога.";
+    formStatus.className = "hint error";
+    return;
+  }
+  for (const [key, value] of Object.entries(preset)) form.elements.namedItem(key).value = value;
+  form.elements.namedItem("duration_hours").value = "";
+  form.elements.namedItem("language").value = "";
+  formStatus.textContent = "Готовый запрос заполнен. Нажмите «Подобрать подрядчиков».";
+  formStatus.className = "hint";
+  result.className = "placeholder";
+  result.replaceChildren(node("p", "", "Условия изменены. Нажмите кнопку, чтобы получить новый результат."));
+}
+
 function renderCard(card) {
   const article = node("article", "card");
   const top = node("div", "card-top");
@@ -151,4 +187,8 @@ form.addEventListener("submit", async (event) => {
 });
 
 retryOptions.addEventListener("click", loadOptions);
+presetButtons.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-preset]");
+  if (button) applyPreset(button.dataset.preset);
+});
 loadOptions();

@@ -23,6 +23,10 @@ h2 { display: flex; align-items: center; gap: 15px; margin-bottom: 4px; font-siz
 .fields input, .fields select, .fields textarea { min-width: 0; width: 100%; color: #17283d; background: #fbfcfd; border: 1px solid #cbd5df; border-radius: 10px; padding: 11px 12px; outline: none; }
 .fields textarea { resize: vertical; line-height: 1.5; }
 .fields small { font-weight: 400; color: #728196; line-height: 1.45; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 23px; }
+.presets p { flex: 0 0 100%; margin: 0 0 2px; color: #64758a; font-size: .83rem; font-weight: 700; }
+.presets button { padding: 8px 10px; border: 1px solid #cbd5df; border-radius: 8px; background: #fff; color: #17283d; font-size: .78rem; cursor: pointer; }
+.presets button:hover { border-color: #087d68; color: #087d68; background: #f1f7f5; }
 :is(input, select, textarea, button):focus-visible { border-color: #087d68; outline: 3px solid #b4e6d1; outline-offset: 1px; }
 .primary { margin-top: 25px; width: 100%; min-height: 50px; border: 0; border-radius: 11px; background: #087d68; color: #fff; font-weight: 750; cursor: pointer; }
 .primary:hover { background: #076c5a; }
