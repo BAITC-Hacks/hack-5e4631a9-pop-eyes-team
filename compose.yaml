@@ -38,6 +38,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-eventmatch}
       POSTGRES_USER: ${POSTGRES_USER:-eventmatch}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      AI_MODE: ${AI_MODE:-auto}
+      AI_TIMEOUT_SECONDS: ${AI_TIMEOUT_SECONDS:-5}
     ports:
       - "127.0.0.1:${APP_PORT:-8000}:8000"
     depends_on:

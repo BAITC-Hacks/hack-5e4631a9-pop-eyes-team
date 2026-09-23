@@ -6,11 +6,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt ./
+COPY requirements.txt requirements-ai.txt ./
 RUN pip install --no-cache-dir -r requirements.txt \
     && useradd --create-home --uid 10001 appuser
 
 COPY app ./app
+COPY ai_module ./ai_module
 COPY tests ./tests
 COPY ["hackathon dataset anonymized .csv", "./data/contractors.csv"]
 
