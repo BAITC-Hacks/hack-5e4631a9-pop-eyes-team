@@ -22,7 +22,8 @@ class AIIntegrationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(len(payload["candidates"]), 4)
             self.assertEqual(payload["request"]["preferences"], fixture["request"]["preferences"])
             return ranking._ground_selection({"selected": [
-                {"id": cid, "evidence_ids": [f"{cid}:description:1"]} for cid in chosen
+                {"id": cid, "distinctive_evidence_id": f"{cid}:description:{number}", "supporting_evidence_ids": []}
+                for cid, number in zip(chosen, [1, 1, 3])
             ]}, payload)
 
         with patch.dict(os.environ, {"AI_MODULE": "ai_module", "AI_MODE": "auto", "OPENAI_API_KEY": "test-key"}), \

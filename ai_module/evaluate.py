@@ -14,6 +14,34 @@ from . import RECOMMENDATION_VERSION, build_evidence, rank_candidates
 from .ranking import MAX_REASON_LENGTH
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "tests/fixtures/ai"
+EXPLANATION_RUBRIC = json.loads(
+    (FIXTURE_DIR.parent / "ai_explanation_rubric.json").read_text(encoding="utf-8")
+)
+
+
+def check_explanation(item, facts):
+    """Check source quotes and curated concrete facts, not general semantics.
+
+    This rubric is used only by evaluation; production selection never sees it.
+    Check the displayed quotes, so a dropped second reference cannot earn credit.
+    """
+    errors = []
+    cited = []
+    for ref in item["evidence_ids"]:
+        if ref not in facts:
+            continue  # The contract check reports unknown references.
+        quote = facts[ref].strip().rstrip(".!?…")
+        if f"«{quote}»" not in item["reason"]:
+            errors.append(f"cited_fact_not_displayed:{item['id']}:{ref}")
+        else:
+            cited.append(quote.casefold())
+    alternatives = EXPLANATION_RUBRIC["profiles"].get(item["id"], [])
+    if alternatives and not any(
+        all(term in quote for term in terms)
+        for terms in alternatives for quote in cited
+    ):
+        errors.append(f"missing_distinctive_fact:{item['id']}")
+    return errors
 
 
 def check_result(fixture, result, *, live):
@@ -35,6 +63,8 @@ def check_result(fixture, result, *, live):
             errors.append(f"missing_checked_date:{item['id']}")
         if len(item["reason"]) > MAX_REASON_LENGTH:
             errors.append(f"explanation_too_long:{item['id']}")
+        if live and result["selection_mode"] == "ai":
+            errors.extend(check_explanation(item, facts))
     if live and candidates:
         if result["selection_mode"] != "ai":
             errors.append("expected_ai_got_fallback")
@@ -70,6 +100,7 @@ async def run(args):
         "live": args.live, "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
         "timeout_seconds": float(os.getenv("AI_TIMEOUT_SECONDS", "8")),
         "recommendation_version": RECOMMENDATION_VERSION,
+        "explanation_rubric_version": EXPLANATION_RUBRIC["version"],
         "scope": "Isolated AI module; not database, HTTP filtering or cache verification",
         "cases": [],
     }

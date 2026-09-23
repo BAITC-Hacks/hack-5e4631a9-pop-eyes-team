@@ -1,0 +1,448 @@
+{
+  "created_at_utc": "2026-09-23T12:35:47.802929+00:00",
+  "live": true,
+  "model": "gpt-4o-mini",
+  "timeout_seconds": 8.0,
+  "recommendation_version": "ranking-v7:evidence-v3:fallback-v2",
+  "explanation_rubric_version": "specific-facts-v1",
+  "scope": "Isolated AI module; not database, HTTP filtering or cache verification",
+  "cases": [
+    {
+      "name": "category_absent",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Астана",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Декоратор",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": ""
+      },
+      "eligible_ids": [],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": []
+      },
+      "cited_facts": {},
+      "reason_lengths": [],
+      "automated_check_errors": []
+    },
+    {
+      "name": "florist",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Флорист",
+        "budget_kzt": 500000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Нужно авторское цветочное оформление корпоративного мероприятия."
+      },
+      "eligible_ids": [
+        "HK-39372"
+      ],
+      "elapsed_seconds": 4.004,
+      "result": {
+        "selection_mode": "ai",
+        "selected": [
+          {
+            "id": "HK-39372",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Ежемесячно реализуем более 1000 заказов»; «Среди наших клиентов и партнёров: SkyLumen, CoffeeNoir, Trickster Café, Suisei Water, Curly Sensei, Hoshizora, Банк «Sakura Credit»».",
+            "evidence_ids": [
+              "HK-39372:description:2",
+              "HK-39372:description:3"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-39372": {
+          "HK-39372:description:2": "Ежемесячно реализуем более 1000 заказов.",
+          "HK-39372:description:3": "Среди наших клиентов и партнёров: SkyLumen, CoffeeNoir, Trickster Café, Suisei Water, Curly Sensei, Hoshizora, Банк «Sakura Credit»."
+        }
+      },
+      "reason_lengths": [
+        225
+      ],
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_business",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Деловой корпоратив: в первую очередь опыт деловых мероприятий и интеллигентный юмор. Без навязчивых конкурсов."
+      },
+      "eligible_ids": [
+        "HK-27222",
+        "HK-29829",
+        "HK-77838",
+        "HK-88430"
+      ],
+      "elapsed_seconds": 2.262,
+      "result": {
+        "selection_mode": "ai",
+        "selected": [
+          {
+            "id": "HK-27222",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Начав карьеру на телевидении, Гоку стал голосом крупнейших медиа Казахстана и постоянным ведущим масштабных событий».",
+            "evidence_ids": [
+              "HK-27222:description:3"
+            ]
+          },
+          {
+            "id": "HK-88430",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Специализируюсь на проведении корпоративных мероприятий, торжеств и деловых встреч».",
+            "evidence_ids": [
+              "HK-88430:description:3"
+            ]
+          },
+          {
+            "id": "HK-77838",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Он — актёр театра и кино, педагог по актёрскому мастерству театральной академии искусств, солист этно-рок группы «Тенгри Rock» и телеведущий телеканала «Hoshizora TV»».",
+            "evidence_ids": [
+              "HK-77838:description:3"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-27222": {
+          "HK-27222:description:3": "Начав карьеру на телевидении, Гоку стал голосом крупнейших медиа Казахстана и постоянным ведущим масштабных событий."
+        },
+        "HK-88430": {
+          "HK-88430:description:3": "Специализируюсь на проведении корпоративных мероприятий, торжеств и деловых встреч."
+        },
+        "HK-77838": {
+          "HK-77838:description:3": "Он — актёр театра и кино, педагог по актёрскому мастерству театральной академии искусств, солист этно-рок группы «Тенгри Rock» и телеведущий телеканала «Hoshizora TV»."
+        }
+      },
+      "reason_lengths": [
+        166,
+        133,
+        217
+      ],
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_december",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-12-19",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Корпоратив с тонким юмором и персональным подходом."
+      },
+      "eligible_ids": [
+        "HK-35215"
+      ],
+      "elapsed_seconds": 1.52,
+      "result": {
+        "selection_mode": "ai",
+        "selected": [
+          {
+            "id": "HK-35215",
+            "reason": "Свободен по календарю на 19.12.2026. В профиле: «Работает на казахском, русском и английском языках».",
+            "evidence_ids": [
+              "HK-35215:description:4"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-35215": {
+          "HK-35215:description:4": "Работает на казахском, русском и английском языках."
+        }
+      },
+      "reason_lengths": [
+        101
+      ],
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_neutral",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": ""
+      },
+      "eligible_ids": [
+        "HK-27222",
+        "HK-29829",
+        "HK-77838",
+        "HK-88430"
+      ],
+      "elapsed_seconds": 1.879,
+      "result": {
+        "selection_mode": "ai",
+        "selected": [
+          {
+            "id": "HK-27222",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Сон Гоку — один из самых востребованных двуязычных ведущих Алматы с опытом более 12 лет».",
+            "evidence_ids": [
+              "HK-27222:description:1"
+            ]
+          },
+          {
+            "id": "HK-29829",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Только развлечения и танцы».",
+            "evidence_ids": [
+              "HK-29829:description:2"
+            ]
+          },
+          {
+            "id": "HK-88430",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Специализируюсь на проведении корпоративных мероприятий, торжеств и деловых встреч».",
+            "evidence_ids": [
+              "HK-88430:description:3"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-27222": {
+          "HK-27222:description:1": "Сон Гоку — один из самых востребованных двуязычных ведущих Алматы с опытом более 12 лет."
+        },
+        "HK-29829": {
+          "HK-29829:description:2": "Только развлечения и танцы."
+        },
+        "HK-88430": {
+          "HK-88430:description:3": "Специализируюсь на проведении корпоративных мероприятий, торжеств и деловых встреч."
+        }
+      },
+      "reason_lengths": [
+        138,
+        77,
+        133
+      ],
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_november",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-11-14",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Корпоратив с юмором и вниманием к гостям."
+      },
+      "eligible_ids": [
+        "HK-27222",
+        "HK-29829",
+        "HK-44733",
+        "HK-44923"
+      ],
+      "elapsed_seconds": 1.958,
+      "result": {
+        "selection_mode": "ai",
+        "selected": [
+          {
+            "id": "HK-27222",
+            "reason": "Свободен по календарю на 14.11.2026. В профиле: «Сон Гоку — один из самых востребованных двуязычных ведущих Алматы с опытом более 12 лет».",
+            "evidence_ids": [
+              "HK-27222:description:1"
+            ]
+          },
+          {
+            "id": "HK-29829",
+            "reason": "Свободен по календарю на 14.11.2026. В профиле: «Без долгих речей и наставлений на ивентах».",
+            "evidence_ids": [
+              "HK-29829:description:1"
+            ]
+          },
+          {
+            "id": "HK-44733",
+            "reason": "Свободен по календарю на 14.11.2026. В профиле: «Ведущий мероприятий с опытом работы более 10 лет»; «Веду как ламповые вечера от 8 человек, так и крупные бизнес форумы на 3000 человек».",
+            "evidence_ids": [
+              "HK-44733:description:1",
+              "HK-44733:description:3"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-27222": {
+          "HK-27222:description:1": "Сон Гоку — один из самых востребованных двуязычных ведущих Алматы с опытом более 12 лет."
+        },
+        "HK-29829": {
+          "HK-29829:description:1": "Без долгих речей и наставлений на ивентах."
+        },
+        "HK-44733": {
+          "HK-44733:description:1": "Ведущий мероприятий с опытом работы более 10 лет.",
+          "HK-44733:description:3": "Веду как ламповые вечера от 8 человек, так и крупные бизнес форумы на 3000 человек."
+        }
+      },
+      "reason_lengths": [
+        138,
+        92,
+        185
+      ],
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_party",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Неформальный корпоратив: главный акцент на развлечениях и танцах, без долгих речей и наставлений."
+      },
+      "eligible_ids": [
+        "HK-27222",
+        "HK-29829",
+        "HK-77838",
+        "HK-88430"
+      ],
+      "elapsed_seconds": 5.695,
+      "result": {
+        "selection_mode": "ai",
+        "selected": [
+          {
+            "id": "HK-29829",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Только развлечения и танцы»; «Без долгих речей и наставлений на ивентах».",
+            "evidence_ids": [
+              "HK-29829:description:2",
+              "HK-29829:description:1"
+            ]
+          },
+          {
+            "id": "HK-27222",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Начав карьеру на телевидении, Гоку стал голосом крупнейших медиа Казахстана и постоянным ведущим масштабных событий».",
+            "evidence_ids": [
+              "HK-27222:description:3"
+            ]
+          },
+          {
+            "id": "HK-88430",
+            "reason": "Свободен по календарю на 10.10.2026. В профиле: «Специализируюсь на проведении корпоративных мероприятий, торжеств и деловых встреч».",
+            "evidence_ids": [
+              "HK-88430:description:3"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-29829": {
+          "HK-29829:description:2": "Только развлечения и танцы.",
+          "HK-29829:description:1": "Без долгих речей и наставлений на ивентах."
+        },
+        "HK-27222": {
+          "HK-27222:description:3": "Начав карьеру на телевидении, Гоку стал голосом крупнейших медиа Казахстана и постоянным ведущим масштабных событий."
+        },
+        "HK-88430": {
+          "HK-88430:description:3": "Специализируюсь на проведении корпоративных мероприятий, торжеств и деловых встреч."
+        }
+      },
+      "reason_lengths": [
+        122,
+        166,
+        133
+      ],
+      "automated_check_errors": []
+    },
+    {
+      "name": "low_budget",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 10000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": ""
+      },
+      "eligible_ids": [],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": []
+      },
+      "cited_facts": {},
+      "reason_lengths": [],
+      "automated_check_errors": []
+    },
+    {
+      "name": "venues",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-11-14",
+        "event_type": "корпоратив",
+        "category": "Банкетный зал",
+        "budget_kzt": 6000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Корпоратив примерно на 180 гостей. В приоритете подтверждённая вместимость, свой кейтеринг и парковка."
+      },
+      "eligible_ids": [
+        "HK-64395",
+        "HK-90011"
+      ],
+      "elapsed_seconds": 1.695,
+      "result": {
+        "selection_mode": "ai",
+        "selected": [
+          {
+            "id": "HK-90011",
+            "reason": "Свободен по календарю на 14.11.2026. В профиле: «Панорамные окна, вместимость зала до 200 гостей, свой кейтеринг и парковка для гостей мероприятия».",
+            "evidence_ids": [
+              "HK-90011:description:2"
+            ]
+          },
+          {
+            "id": "HK-64395",
+            "reason": "Свободен по календарю на 14.11.2026. В профиле: «Nerima Terrace – стильная панорамная локация в Алматы с захватывающим видом на город и горы».",
+            "evidence_ids": [
+              "HK-64395:description:1"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-90011": {
+          "HK-90011:description:2": "Панорамные окна, вместимость зала до 200 гостей, свой кейтеринг и парковка для гостей мероприятия."
+        },
+        "HK-64395": {
+          "HK-64395:description:1": "Nerima Terrace – стильная панорамная локация в Алматы с захватывающим видом на город и горы."
+        }
+      },
+      "reason_lengths": [
+        148,
+        142
+      ],
+      "automated_check_errors": []
+    }
+  ]
+}
