@@ -1,0 +1,2 @@
+# Python 3.11+. Include this file from the backend's dependency list.
+openai==2.54.0
