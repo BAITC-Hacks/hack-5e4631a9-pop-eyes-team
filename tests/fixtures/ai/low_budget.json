@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "source": "hackathon dataset anonymized .csv",
+    "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+    "expected_status": "no_matches",
+    "expected_eligible_count": 0,
+    "expected_fallback_ids": [],
+    "quality_checks": {}
+  },
+  "request": {
+    "city": "Алматы",
+    "date": "2026-10-10",
+    "event_type": "корпоратив",
+    "category": "Ведущий",
+    "budget_kzt": 10000,
+    "duration_hours": null,
+    "language": null,
+    "preferences": ""
+  },
+  "eligible_candidates": []
+}

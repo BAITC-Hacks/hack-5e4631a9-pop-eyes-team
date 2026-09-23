@@ -14,6 +14,7 @@ COPY app ./app
 COPY ai_module ./ai_module
 COPY frontend ./frontend
 COPY tests ./tests
+COPY scripts ./scripts
 COPY ["hackathon dataset anonymized .csv", "./data/contractors.csv"]
 
 USER appuser

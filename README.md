@@ -83,9 +83,9 @@ docker compose exec db psql -U eventmatch -d eventmatch -v ON_ERROR_STOP=1 -f /d
 
 ```dotenv
 AI_MODULE=ai_module
-AI_VERSION=prompt-v1
+AI_VERSION=ranking-v5:evidence-v3:fallback-v1
 AI_MODE=auto
-AI_TIMEOUT_SECONDS=5
+AI_TIMEOUT_SECONDS=8
 OPENAI_API_KEY=your_key
 OPENAI_MODEL=gpt-4o-mini
 ```
@@ -105,6 +105,29 @@ docker compose exec app python -m unittest discover -s tests -v
 Проверки сравнивают все поля CSV с реальной БД, выполняют HTTP-запросы, проверяют фильтры, пустые выдачи, ошибки 422, карточки, параллельное сохранение и повторяемость. Контракт AI проверяется тестовой функцией на четырёх реальных допустимых профилях; эти тесты не вызывают внешнюю модель и не доказывают качество настоящего AI.
 
 Через форму: Алматы → Ведущий → 10.10.2026 → корпоратив → 1 млн ₸ даёт 4 допустимых кандидата и 3 карточки. На 19.12.2026 остаётся один. При бюджете 10 тыс. ₸ — `no_matches`; Астана + Декоратор — `category_absent`.
+
+## Проверка AI отдельно от Docker
+
+Модуль использует общую нормализацию PostgreSQL `Decimal`, выбирает всех кандидатов
+для сравнения и собирает объяснения из исходных цитат. В `tests/fixtures/ai` находятся
+девять сценариев на реальном каталоге; `scripts/build_ai_fixtures.py` воспроизводит
+тестовые данные и не заменяет SQL-импорт приложения.
+
+После установки `requirements.txt`, без ключа и сетевых вызовов:
+
+```console
+python -m unittest discover -s tests -p "test_ai*.py" -v
+python scripts/build_ai_fixtures.py --check
+python -m ai_module.evaluate
+```
+
+35 локальных тестов проходят. Отдельный прогон семи непустых сценариев через OpenAI
+занял 1,56–3,82 секунды на вызов; два пустых сценария обошлись без сети.
+Это проверка AI-модуля, не измерение полного HTTP-сценария с БД.
+[Результаты и ограничения](docs/AI_EVALUATION.md), [инструкция AI](docs/AI_MODULE.md).
+
+Для повторного платного прогона: `python -m ai_module.evaluate --live` после загрузки
+настроек сервера. По умолчанию CLI проверяет только fallback.
 
 ## Управление
 

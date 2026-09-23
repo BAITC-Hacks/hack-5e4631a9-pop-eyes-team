@@ -6,6 +6,7 @@ import json
 import os
 import unittest
 from datetime import date
+from decimal import Decimal
 from unittest.mock import AsyncMock, patch
 
 import httpx
@@ -49,7 +50,19 @@ def selection(*ids):
     ]}
 
 
+def model_selection(*ids):
+    return {"selected": [
+        {"id": item, "evidence_ids": [f"{item}:description:1"],
+         "request_evidence_id": "request:1"}
+        for item in ids
+    ]}
+
+
 class EvidenceTests(unittest.TestCase):
+    def test_postgresql_decimal_and_json_float_have_identical_evidence(self):
+        self.assertEqual(build_evidence(candidate("TEST-A", max_hours=Decimal("5.00"))),
+                         build_evidence(candidate("TEST-A", max_hours=5.0)))
+
     def test_stable_across_json_roundtrip_and_mapping_order(self):
         profile = candidate("TEST-A")
         roundtrip = json.loads(json.dumps(dict(reversed(list(profile.items())))))
@@ -65,6 +78,13 @@ class EvidenceTests(unittest.TestCase):
         facts = build_evidence(candidate("TEST-A", max_hours=None, price_imputed=True))
         self.assertIn("неприменимо", facts["TEST-A:field:max_hours"])
         self.assertIn("true", facts["TEST-A:field:price_imputed"])
+
+    def test_long_service_list_keeps_bullets_and_words_in_short_facts(self):
+        description = "Услуги: • Живой юмор • Музыка • " + "Помощь с организацией " * 30
+        facts = build_evidence(candidate("TEST-A", description=description))
+        fragments = [value for key, value in facts.items() if ":description:" in key]
+        self.assertEqual(" ".join(fragments), " ".join(description.split()))
+        self.assertTrue(all(len(fragment) <= 180 for fragment in fragments))
 
     def test_evidence_is_scoped_to_candidate(self):
         self.assertFalse(set(build_evidence(candidate("TEST-A"))) & set(build_evidence(candidate("TEST-B"))))
@@ -223,7 +243,7 @@ class RankingTests(unittest.IsolatedAsyncioTestCase):
             await rank_candidates(REQUEST, [self.profiles[0], self.profiles[0]])
 
     async def test_real_sdk_request_and_response_without_network(self):
-        expected = selection("TEST-D", "TEST-B", "TEST-C")
+        expected = model_selection("TEST-D", "TEST-B", "TEST-C")
         requests = []
 
         def handler(request):
@@ -248,8 +268,23 @@ class RankingTests(unittest.IsolatedAsyncioTestCase):
 
         with patch("openai.AsyncOpenAI", client):
             result = await rank_candidates(REQUEST, self.profiles)
-        self.assertEqual(result, {"selection_mode": "ai", **expected})
+        self.assertEqual(result["selection_mode"], "ai")
+        self.assertEqual([item["id"] for item in result["selected"]], ["TEST-D", "TEST-B", "TEST-C"])
+        for item in result["selected"]:
+            self.assertIn("Ведёт деловые мероприятия.", item["reason"])
+            self.assertIn("По пожеланию", item["reason"])
         self.assertEqual(len(requests), 1)
+
+    async def test_raw_postgresql_numbers_work_in_fallback(self):
+        with patch.dict(os.environ, {"AI_MODE": "fallback"}):
+            result = await rank_candidates(REQUEST, [candidate("TEST-A", max_hours=Decimal("5.00"))])
+        self.assertEqual(result["selection_mode"], "fallback")
+        self.assertEqual(result["selected"][0]["id"], "TEST-A")
+
+    async def test_invalid_hours_are_rejected_before_model_call(self):
+        for hours in (Decimal("NaN"), float("inf"), -1, 0, True, "5"):
+            with self.subTest(hours=hours), self.assertRaises(ValueError):
+                await rank_candidates(REQUEST, [candidate("TEST-A", max_hours=hours)])
 
     async def test_http_errors_refusal_incomplete_and_bad_json_use_fallback(self):
         success = {"id": "resp_test", "object": "response", "created_at": 1,
@@ -275,6 +310,46 @@ class RankingTests(unittest.IsolatedAsyncioTestCase):
                 result = await rank_candidates(REQUEST, self.profiles)
             self.assertEqual(result["selection_mode"], "fallback")
             self.assertEqual(len(calls), 1)
+
+
+class GroundingTests(unittest.TestCase):
+    def setUp(self):
+        self.profile = candidate("TEST-A")
+        self.payload = {"request": REQUEST, "selection_count": 1,
+                        "candidates": [{"id": "TEST-A", "evidence": build_evidence(self.profile)}]}
+
+    def test_reason_uses_only_exact_quotes_and_request_excerpt(self):
+        raw = model_selection("TEST-A")
+        result = ranking._ground_selection(raw, self.payload)
+        reason = result["selected"][0]["reason"]
+        self.assertEqual(reason, 'По пожеланию «Интеллигентный юмор, без длинных речей»: в профиле указано «Ведёт деловые мероприятия.».')
+
+    def test_model_cannot_inject_fabricated_reason(self):
+        raw = model_selection("TEST-A")
+        raw["selected"][0]["reason"] = "100 лет опыта и 1000 проверенных отзывов"
+        with self.assertRaises(ValueError):
+            ranking._ground_selection(raw, self.payload)
+
+    def test_rejects_invented_context_label_and_foreign_facts(self):
+        for field, value in [("request_evidence_id", "request:999"),
+                             ("evidence_ids", ["OTHER:description:1"]),
+                             ("match", "perfect"), ("evidence_ids", []),
+                             ("evidence_ids", ["TEST-A:field:anon_name"])]:
+            raw = model_selection("TEST-A")
+            raw["selected"][0][field] = value
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                ranking._ground_selection(raw, self.payload)
+
+    def test_empty_preferences_use_event_type(self):
+        self.payload["request"] = {**REQUEST, "preferences": ""}
+        raw = model_selection("TEST-A")
+        reason = ranking._ground_selection(raw, self.payload)["selected"][0]["reason"]
+        self.assertTrue(reason.startswith('Для формата «корпоратив»'))
+
+    def test_long_source_quotes_are_rejected_not_silently_truncated(self):
+        self.payload["candidates"][0]["evidence"]["TEST-A:description:1"] = "А" * 361
+        with self.assertRaises(ValueError):
+            ranking._ground_selection(model_selection("TEST-A"), self.payload)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,537 @@
+{
+  "created_at_utc": "2026-09-23T11:10:37.997702+00:00",
+  "live": false,
+  "model": "gpt-4o-mini",
+  "timeout_seconds": 8.0,
+  "recommendation_version": "ranking-v5:evidence-v3:fallback-v1",
+  "scope": "Isolated AI module; not database, HTTP filtering or cache verification",
+  "cases": [
+    {
+      "name": "category_absent",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Астана",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Декоратор",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": ""
+      },
+      "eligible_ids": [],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": []
+      },
+      "cited_facts": {},
+      "automated_check_errors": []
+    },
+    {
+      "name": "florist",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Флорист",
+        "budget_kzt": 500000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Нужно авторское цветочное оформление корпоративного мероприятия."
+      },
+      "eligible_ids": [
+        "HK-39372"
+      ],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": [
+          {
+            "id": "HK-39372",
+            "reason": "Начальная цена — от 200 000 ₸ (подставленное значение); вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: свадьба, корпоратив, конференция, юбилей.",
+            "evidence_ids": [
+              "HK-39372:field:price_from_kzt",
+              "HK-39372:field:price_imputed",
+              "HK-39372:field:city",
+              "HK-39372:field:city_imputed",
+              "HK-39372:field:event_formats"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-39372": {
+          "HK-39372:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 200000",
+          "HK-39372:field:price_imputed": "Цена подставлена в исходных данных: true",
+          "HK-39372:field:city": "Город: \"Алматы\"",
+          "HK-39372:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-39372:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"корпоратив\", \"конференция\", \"юбилей\"]"
+        }
+      },
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_business",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Деловой корпоратив: в первую очередь опыт деловых мероприятий и интеллигентный юмор. Без навязчивых конкурсов."
+      },
+      "eligible_ids": [
+        "HK-27222",
+        "HK-29829",
+        "HK-77838",
+        "HK-88430"
+      ],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": [
+          {
+            "id": "HK-88430",
+            "reason": "Начальная цена — от 500 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: корпоратив, конференция, юбилей.",
+            "evidence_ids": [
+              "HK-88430:field:price_from_kzt",
+              "HK-88430:field:price_imputed",
+              "HK-88430:field:city",
+              "HK-88430:field:city_imputed",
+              "HK-88430:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-29829",
+            "reason": "Начальная цена — от 700 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: день рождения, корпоратив, юбилей.",
+            "evidence_ids": [
+              "HK-29829:field:price_from_kzt",
+              "HK-29829:field:price_imputed",
+              "HK-29829:field:city",
+              "HK-29829:field:city_imputed",
+              "HK-29829:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-27222",
+            "reason": "Начальная цена — от 1 000 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: свадьба, той, корпоратив, конференция.",
+            "evidence_ids": [
+              "HK-27222:field:price_from_kzt",
+              "HK-27222:field:price_imputed",
+              "HK-27222:field:city",
+              "HK-27222:field:city_imputed",
+              "HK-27222:field:event_formats"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-88430": {
+          "HK-88430:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 500000",
+          "HK-88430:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-88430:field:city": "Город: \"Алматы\"",
+          "HK-88430:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-88430:field:event_formats": "Форматы мероприятий: [\"корпоратив\", \"конференция\", \"юбилей\"]"
+        },
+        "HK-29829": {
+          "HK-29829:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 700000",
+          "HK-29829:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-29829:field:city": "Город: \"Алматы\"",
+          "HK-29829:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-29829:field:event_formats": "Форматы мероприятий: [\"день рождения\", \"корпоратив\", \"юбилей\"]"
+        },
+        "HK-27222": {
+          "HK-27222:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 1000000",
+          "HK-27222:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-27222:field:city": "Город: \"Алматы\"",
+          "HK-27222:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-27222:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"той\", \"корпоратив\", \"конференция\"]"
+        }
+      },
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_december",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-12-19",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Корпоратив с тонким юмором и персональным подходом."
+      },
+      "eligible_ids": [
+        "HK-35215"
+      ],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": [
+          {
+            "id": "HK-35215",
+            "reason": "Начальная цена — от 900 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: свадьба, той, юбилей, корпоратив.",
+            "evidence_ids": [
+              "HK-35215:field:price_from_kzt",
+              "HK-35215:field:price_imputed",
+              "HK-35215:field:city",
+              "HK-35215:field:city_imputed",
+              "HK-35215:field:event_formats"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-35215": {
+          "HK-35215:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 900000",
+          "HK-35215:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-35215:field:city": "Город: \"Алматы\"",
+          "HK-35215:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-35215:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"той\", \"юбилей\", \"корпоратив\"]"
+        }
+      },
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_neutral",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": ""
+      },
+      "eligible_ids": [
+        "HK-27222",
+        "HK-29829",
+        "HK-77838",
+        "HK-88430"
+      ],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": [
+          {
+            "id": "HK-88430",
+            "reason": "Начальная цена — от 500 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: корпоратив, конференция, юбилей.",
+            "evidence_ids": [
+              "HK-88430:field:price_from_kzt",
+              "HK-88430:field:price_imputed",
+              "HK-88430:field:city",
+              "HK-88430:field:city_imputed",
+              "HK-88430:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-29829",
+            "reason": "Начальная цена — от 700 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: день рождения, корпоратив, юбилей.",
+            "evidence_ids": [
+              "HK-29829:field:price_from_kzt",
+              "HK-29829:field:price_imputed",
+              "HK-29829:field:city",
+              "HK-29829:field:city_imputed",
+              "HK-29829:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-27222",
+            "reason": "Начальная цена — от 1 000 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: свадьба, той, корпоратив, конференция.",
+            "evidence_ids": [
+              "HK-27222:field:price_from_kzt",
+              "HK-27222:field:price_imputed",
+              "HK-27222:field:city",
+              "HK-27222:field:city_imputed",
+              "HK-27222:field:event_formats"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-88430": {
+          "HK-88430:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 500000",
+          "HK-88430:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-88430:field:city": "Город: \"Алматы\"",
+          "HK-88430:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-88430:field:event_formats": "Форматы мероприятий: [\"корпоратив\", \"конференция\", \"юбилей\"]"
+        },
+        "HK-29829": {
+          "HK-29829:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 700000",
+          "HK-29829:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-29829:field:city": "Город: \"Алматы\"",
+          "HK-29829:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-29829:field:event_formats": "Форматы мероприятий: [\"день рождения\", \"корпоратив\", \"юбилей\"]"
+        },
+        "HK-27222": {
+          "HK-27222:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 1000000",
+          "HK-27222:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-27222:field:city": "Город: \"Алматы\"",
+          "HK-27222:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-27222:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"той\", \"корпоратив\", \"конференция\"]"
+        }
+      },
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_november",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-11-14",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Корпоратив с юмором и вниманием к гостям."
+      },
+      "eligible_ids": [
+        "HK-27222",
+        "HK-29829",
+        "HK-44733",
+        "HK-44923"
+      ],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": [
+          {
+            "id": "HK-44923",
+            "reason": "Начальная цена — от 650 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: свадьба, юбилей, корпоратив.",
+            "evidence_ids": [
+              "HK-44923:field:price_from_kzt",
+              "HK-44923:field:price_imputed",
+              "HK-44923:field:city",
+              "HK-44923:field:city_imputed",
+              "HK-44923:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-29829",
+            "reason": "Начальная цена — от 700 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: день рождения, корпоратив, юбилей.",
+            "evidence_ids": [
+              "HK-29829:field:price_from_kzt",
+              "HK-29829:field:price_imputed",
+              "HK-29829:field:city",
+              "HK-29829:field:city_imputed",
+              "HK-29829:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-27222",
+            "reason": "Начальная цена — от 1 000 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: свадьба, той, корпоратив, конференция.",
+            "evidence_ids": [
+              "HK-27222:field:price_from_kzt",
+              "HK-27222:field:price_imputed",
+              "HK-27222:field:city",
+              "HK-27222:field:city_imputed",
+              "HK-27222:field:event_formats"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-44923": {
+          "HK-44923:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 650000",
+          "HK-44923:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-44923:field:city": "Город: \"Алматы\"",
+          "HK-44923:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-44923:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"юбилей\", \"корпоратив\"]"
+        },
+        "HK-29829": {
+          "HK-29829:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 700000",
+          "HK-29829:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-29829:field:city": "Город: \"Алматы\"",
+          "HK-29829:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-29829:field:event_formats": "Форматы мероприятий: [\"день рождения\", \"корпоратив\", \"юбилей\"]"
+        },
+        "HK-27222": {
+          "HK-27222:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 1000000",
+          "HK-27222:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-27222:field:city": "Город: \"Алматы\"",
+          "HK-27222:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-27222:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"той\", \"корпоратив\", \"конференция\"]"
+        }
+      },
+      "automated_check_errors": []
+    },
+    {
+      "name": "hosts_party",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 1000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Неформальный корпоратив: главный акцент на развлечениях и танцах, без долгих речей и наставлений."
+      },
+      "eligible_ids": [
+        "HK-27222",
+        "HK-29829",
+        "HK-77838",
+        "HK-88430"
+      ],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": [
+          {
+            "id": "HK-88430",
+            "reason": "Начальная цена — от 500 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: корпоратив, конференция, юбилей.",
+            "evidence_ids": [
+              "HK-88430:field:price_from_kzt",
+              "HK-88430:field:price_imputed",
+              "HK-88430:field:city",
+              "HK-88430:field:city_imputed",
+              "HK-88430:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-29829",
+            "reason": "Начальная цена — от 700 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: день рождения, корпоратив, юбилей.",
+            "evidence_ids": [
+              "HK-29829:field:price_from_kzt",
+              "HK-29829:field:price_imputed",
+              "HK-29829:field:city",
+              "HK-29829:field:city_imputed",
+              "HK-29829:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-27222",
+            "reason": "Начальная цена — от 1 000 000 ₸; вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: свадьба, той, корпоратив, конференция.",
+            "evidence_ids": [
+              "HK-27222:field:price_from_kzt",
+              "HK-27222:field:price_imputed",
+              "HK-27222:field:city",
+              "HK-27222:field:city_imputed",
+              "HK-27222:field:event_formats"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-88430": {
+          "HK-88430:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 500000",
+          "HK-88430:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-88430:field:city": "Город: \"Алматы\"",
+          "HK-88430:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-88430:field:event_formats": "Форматы мероприятий: [\"корпоратив\", \"конференция\", \"юбилей\"]"
+        },
+        "HK-29829": {
+          "HK-29829:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 700000",
+          "HK-29829:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-29829:field:city": "Город: \"Алматы\"",
+          "HK-29829:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-29829:field:event_formats": "Форматы мероприятий: [\"день рождения\", \"корпоратив\", \"юбилей\"]"
+        },
+        "HK-27222": {
+          "HK-27222:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 1000000",
+          "HK-27222:field:price_imputed": "Цена подставлена в исходных данных: false",
+          "HK-27222:field:city": "Город: \"Алматы\"",
+          "HK-27222:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-27222:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"той\", \"корпоратив\", \"конференция\"]"
+        }
+      },
+      "automated_check_errors": []
+    },
+    {
+      "name": "low_budget",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-10-10",
+        "event_type": "корпоратив",
+        "category": "Ведущий",
+        "budget_kzt": 10000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": ""
+      },
+      "eligible_ids": [],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": []
+      },
+      "cited_facts": {},
+      "automated_check_errors": []
+    },
+    {
+      "name": "venues",
+      "source_sha256_lf": "87d082de8481f63795ba9d5b9509b5ffbdeabe3f99efd28b114be780df35d422",
+      "request": {
+        "city": "Алматы",
+        "date": "2026-11-14",
+        "event_type": "корпоратив",
+        "category": "Банкетный зал",
+        "budget_kzt": 6000000,
+        "duration_hours": null,
+        "language": null,
+        "preferences": "Корпоратив примерно на 180 гостей. В приоритете подтверждённая вместимость, свой кейтеринг и парковка."
+      },
+      "eligible_ids": [
+        "HK-64395",
+        "HK-90011"
+      ],
+      "elapsed_seconds": 0.001,
+      "result": {
+        "selection_mode": "fallback",
+        "selected": [
+          {
+            "id": "HK-64395",
+            "reason": "Начальная цена — от 2 500 000 ₸ (подставленное значение); вариант выбран резервным подбором по цене. Город в профиле: Алматы (подставленное значение); форматы: свадьба, корпоратив, юбилей, день рождения.",
+            "evidence_ids": [
+              "HK-64395:field:price_from_kzt",
+              "HK-64395:field:price_imputed",
+              "HK-64395:field:city",
+              "HK-64395:field:city_imputed",
+              "HK-64395:field:event_formats"
+            ]
+          },
+          {
+            "id": "HK-90011",
+            "reason": "Начальная цена — от 3 200 000 ₸ (подставленное значение); вариант выбран резервным подбором по цене. Город в профиле: Алматы; форматы: свадьба, той, корпоратив, юбилей.",
+            "evidence_ids": [
+              "HK-90011:field:price_from_kzt",
+              "HK-90011:field:price_imputed",
+              "HK-90011:field:city",
+              "HK-90011:field:city_imputed",
+              "HK-90011:field:event_formats"
+            ]
+          }
+        ]
+      },
+      "cited_facts": {
+        "HK-64395": {
+          "HK-64395:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 2500000",
+          "HK-64395:field:price_imputed": "Цена подставлена в исходных данных: true",
+          "HK-64395:field:city": "Город: \"Алматы\"",
+          "HK-64395:field:city_imputed": "Город подставлен в исходных данных: true",
+          "HK-64395:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"корпоратив\", \"юбилей\", \"день рождения\"]"
+        },
+        "HK-90011": {
+          "HK-90011:field:price_from_kzt": "Начальная цена, тенге (не окончательная стоимость): 3200000",
+          "HK-90011:field:price_imputed": "Цена подставлена в исходных данных: true",
+          "HK-90011:field:city": "Город: \"Алматы\"",
+          "HK-90011:field:city_imputed": "Город подставлен в исходных данных: false",
+          "HK-90011:field:event_formats": "Форматы мероприятий: [\"свадьба\", \"той\", \"корпоратив\", \"юбилей\"]"
+        }
+      },
+      "automated_check_errors": []
+    }
+  ]
+}
